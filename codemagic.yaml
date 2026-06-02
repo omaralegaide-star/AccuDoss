@@ -1,59 +1,16 @@
-# Codemagic CI/CD configuration for Kotlin Multiplatform (KMP) iOS Application
-# For support/questions, visit: https://docs.codemagic.io/
-
 workflows:
   ios-kmp-workflow:
-    name: Build AccuDose KMP iOS App
+    name: AccuDose KMP iOS App
     max_build_duration: 60
-    instance_type: mac_mini_m1 # Compile on fast Apple Silicon M1 machines
-    
-    environment:
-      groups:
-        - signing_credentials # Define this group in Codemagic UI if using App Store certificates
-      vars:
-        XCODE_SCHEME: "iosApp"
-        XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
-      java: 17
-
-    triggering:
-      events:
-        - push
-        - pull_request
-      branches:
-        - main
-        - master
-
+    instance_type: mac_mini_m1
     scripts:
-      - name: Make Gradle wrapper executable
+      - name: Xcode select
         script: |
-          chmod +x gradlew
-
-      - name: Precompile Kotlin Native Framework for iOS Arm64
+          xcode-select -s /Applications/Xcode.app
+      - name: Build iOS App
         script: |
-          ./gradlew :composeApp:linkReleaseFrameworkIosArm64
-
-      - name: Build Unsigned Xcode Archive
-        script: |
-          xcodebuild \
-            -project "$XCODE_PROJECT" \
-            -scheme "$XCODE_SCHEME" \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath "$PWD/iosApp/build/iosApp.xcarchive" \
-            archive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            PROVISIONING_PROFILE_SPECIFIER=""
-
-      - name: Package App as Sideloadable IPA (Unsigned)
-        script: |
-          cd iosApp/build
-          mkdir -p Payload
-          cp -r iosApp.xcarchive/Products/Applications/iosApp.app Payload/
-          zip -r AccuDose-Unsigned.ipa Payload
-          echo "Unsigned IPA packaged successfully at iosApp/build/AccuDose-Unsigned.ipa"
-
+          cd app/iosApp
+          xcodebuild -workspace iosApp.xcworkspace -scheme iosApp -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO
     artifacts:
-      - iosApp/build/*.ipa
-      - composeApp/build/cocoapods/framework/*.framework
+      - app/iosApp/build/Release-iphoneos/*.ipa
+      
