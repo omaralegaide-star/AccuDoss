@@ -5,24 +5,25 @@ workflows:
   ios-kmp-workflow:
     name: Build AccuDose KMP iOS App
     max_build_duration: 60
-    instance_type: mac_mini_m1 # ط§ظ„طھط´ط؛ظٹظ„ ط¹ظ„ظ‰ ط®ظˆط§ط¯ظ… ظ…ط§ظƒ ظ…ظٹظ†ظٹ ط§ظ„ط³ط±ظٹط¹ط© ظˆط§ظ„ظ…ط³طھظ‚ط±ط©
-
+    instance_type: mac_mini_m1 # Compile on fast Apple Silicon M1 machines
+    
     environment:
       groups:
-        - signing_credentials # ظٹطھظ… طھط¹ط±ظٹظپظ‡ ظپظٹ ظ„ظˆط­ط© طھط­ظƒظ… Codemagic ظ„ط´ظ‡ط§ط¯ط§طھ ط¢ط¨ظ„ ط¥ظ† ظˆط¬ط¯طھ
+        - signing_credentials # Define this group in Codemagic UI if using App Store certificates
       vars:
         XCODE_SCHEME: "iosApp"
         XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
       java: 17
-      xcode: latest # ظ‡ط°ط§ ط§ظ„ط³ط·ط± ظٹظ‚ظˆظ… ط¨ط§ط®طھظٹط§ط± ط§ظ„ظ€ Xcode طھظ„ظ‚ط§ط¦ظٹط§ظ‹ ظˆط¨ط£ظ…ط§ظ† طھط§ظ… ط¯ظˆظ† ظ…ط´ط§ظƒظ„ ط§ظ„طµظ„ط§ط­ظٹط§طھ
+      xcode: latest
 
     triggering:
       events:
         - push
         - pull_request
-      branches:
-        - main
-        - master
+      branch_filter:
+        target:
+          - main
+          - master
 
     scripts:
       - name: Make Gradle wrapper executable
