@@ -69,6 +69,14 @@ sealed class AppScreen {
     object AboutView : AppScreen()
 }
 
+// Age approximation chip structure representation
+data class AgeChipInfo(
+    val id: String,
+    val label: String,
+    val weightKg: Double,
+    val ageMonths: String
+)
+
 // Category structures representation
 data class MedicalCategory(
     val id: String,
@@ -215,6 +223,19 @@ fun normalizeArabicDigits(input: String): String {
         }
     }.joinToString("")
 }
+
+fun formatDouble(value: Double): String {
+    if (value == value.toLong().toDouble()) {
+        return value.toLong().toString()
+    }
+    val rounded = ((value * 100.0) + 0.5).toLong() / 100.0
+    val str = rounded.toString()
+    if (str.endsWith(".0")) {
+        return str.substring(0, str.length - 2)
+    }
+    return str
+}
+
 
 // Tactile key events debouncer
 class InputDebouncer(initialValue: String = "") {
