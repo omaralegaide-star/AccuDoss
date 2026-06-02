@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Centered bold capsule pill rotated 45 degrees -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M38.5,69.5 L69.5,38.5 C74.5,33.5 82.5,33.5 87.5,38.5 C92.5,43.5 92.5,51.5 87.5,56.5 L56.5,87.5 C51.5,92.5 43.5,92.5 38.5,87.5 C33.5,82.5 33.5,74.5 38.5,69.5 Z" />
+    
+    <!-- Medicine cross inside the capsule cap -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M59,43h10v-10h6v10h10v6h-10v10h-6v-10h-10z" />
+</vector>

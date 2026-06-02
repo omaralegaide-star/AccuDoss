@@ -29,10 +29,6 @@ workflows:
         script: |
           chmod +x gradlew
 
-      - name: Precompile Kotlin Native Framework for iOS Arm64
-        script: |
-          ./gradlew :composeApp:linkReleaseFrameworkIosArm64
-
       - name: Build Unsigned Xcode Archive
         script: |
           xcodebuild \
@@ -57,4 +53,4 @@ workflows:
 
     artifacts:
       - iosApp/build/*.ipa
-      - composeApp/build/cocoapods/framework/*.framework
+      - composeApp/build/xcode-frameworks/**/*.framework
