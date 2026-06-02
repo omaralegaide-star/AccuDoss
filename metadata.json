@@ -1,0 +1,8 @@
+{
+  "name": "Remix: AccuDose",
+  "description": "تطبيق احترافي لحساب جرعات الأدوية بدقة وسهولة بناءً على وزن المريض، عمره، والاحتياجات الطبية المحددة لمختلف الفئات العمرية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
