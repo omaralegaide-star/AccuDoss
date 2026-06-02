@@ -1,16 +1,60 @@
+# Codemagic CI/CD configuration for Kotlin Multiplatform (KMP) iOS Application
+# For support/questions, visit: https://docs.codemagic.io/
+
 workflows:
   ios-kmp-workflow:
-    name: AccuDose KMP iOS App
+    name: Build AccuDose KMP iOS App
     max_build_duration: 60
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m1 # ط§ظ„طھط´ط؛ظٹظ„ ط¹ظ„ظ‰ ط®ظˆط§ط¯ظ… ظ…ط§ظƒ ظ…ظٹظ†ظٹ ط§ظ„ط³ط±ظٹط¹ط© ظˆط§ظ„ظ…ط³طھظ‚ط±ط©
+
+    environment:
+      groups:
+        - signing_credentials # ظٹطھظ… طھط¹ط±ظٹظپظ‡ ظپظٹ ظ„ظˆط­ط© طھط­ظƒظ… Codemagic ظ„ط´ظ‡ط§ط¯ط§طھ ط¢ط¨ظ„ ط¥ظ† ظˆط¬ط¯طھ
+      vars:
+        XCODE_SCHEME: "iosApp"
+        XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
+      java: 17
+      xcode: latest # ظ‡ط°ط§ ط§ظ„ط³ط·ط± ظٹظ‚ظˆظ… ط¨ط§ط®طھظٹط§ط± ط§ظ„ظ€ Xcode طھظ„ظ‚ط§ط¦ظٹط§ظ‹ ظˆط¨ط£ظ…ط§ظ† طھط§ظ… ط¯ظˆظ† ظ…ط´ط§ظƒظ„ ط§ظ„طµظ„ط§ط­ظٹط§طھ
+
+    triggering:
+      events:
+        - push
+        - pull_request
+      branches:
+        - main
+        - master
+
     scripts:
-      - name: Xcode select
+      - name: Make Gradle wrapper executable
         script: |
-          xcode-select -s /Applications/Xcode.app
-      - name: Build iOS App
+          chmod +x gradlew
+
+      - name: Precompile Kotlin Native Framework for iOS Arm64
         script: |
-          cd app/iosApp
-          xcodebuild -workspace iosApp.xcworkspace -scheme iosApp -sdk iphoneos -configuration Release CODE_SIGNING_ALLOWED=NO
+          ./gradlew :composeApp:linkReleaseFrameworkIosArm64
+
+      - name: Build Unsigned Xcode Archive
+        script: |
+          xcodebuild \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$PWD/iosApp/build/iosApp.xcarchive" \
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
+
+      - name: Package App as Sideloadable IPA (Unsigned)
+        script: |
+          cd iosApp/build
+          mkdir -p Payload
+          cp -r iosApp.xcarchive/Products/Applications/iosApp.app Payload/
+          zip -r AccuDose-Unsigned.ipa Payload
+          echo "Unsigned IPA packaged successfully at iosApp/build/AccuDose-Unsigned.ipa"
+
     artifacts:
-      - app/iosApp/build/Release-iphoneos/*.ipa
-      
+      - iosApp/build/*.ipa
+      - composeApp/build/cocoapods/framework/*.framework
