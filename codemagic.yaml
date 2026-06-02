@@ -20,10 +20,9 @@ workflows:
       events:
         - push
         - pull_request
-      branch_filter:
-        target:
-          - main
-          - master
+      branch_patterns:
+        - pattern: main
+        - pattern: master
 
     scripts:
       - name: Make Gradle wrapper executable
